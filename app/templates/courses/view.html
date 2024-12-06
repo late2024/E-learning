@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Course Details -->
+        <div class="col-md-8">
+            <h1 class="mb-3">{{ course.title }}</h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">About this course</h5>
+                    <p class="card-text">{{ course.description }}</p>
+                    
+                    <div class="mt-4">
+                        <h6>Course Information:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Instructor:</strong> {{ course.instructor.username }}</li>
+                            <li><strong>Created:</strong> {{ course.created_at.strftime('%B %d, %Y') }}</li>
+                            <li><strong>Enrolled Students:</strong> {{ course.enrollments|length }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    {% if course.price == 0 %}
+                        <h3 class="card-title text-success">Free</h3>
+                    {% else %}
+                        <h3 class="card-title">${{ "%.2f"|format(course.price) }}</h3>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated %}
+                        {% if is_enrolled %}
+                            <p class="text-success mb-3">✓ You are enrolled in this course</p>
+                            <a href="{{ url_for('courses.view', course_id=course.id) }}" 
+                               class="btn btn-primary btn-lg w-100">View Course</a>
+                        {% elif course.instructor_id == current_user.id %}
+                            <a href="{{ url_for('courses.manage', course_id=course.id) }}" 
+                               class="btn btn-primary btn-lg w-100">Manage Course</a>
+                        {% else %}
+                            <a href="{{ url_for('courses.enroll', course_id=course.id) }}" 
+                               class="btn btn-success btn-lg w-100">Enroll Now</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg w-100">Login to Enroll</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Course Features -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">What You'll Get</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="fas fa-infinity me-2"></i>
+                        Full lifetime access
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-certificate me-2"></i>
+                        Certificate of completion
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-mobile-alt me-2"></i>
+                        Access on mobile and desktop
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
